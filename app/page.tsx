@@ -327,7 +327,7 @@ export default function Home() {
       <section id="programs" className="py-24 bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-sky-400 font-semibold tracking-wide uppercase text-sm">Katalog Program 2023</h2>
+            <h2 className="text-sky-400 font-semibold tracking-wide uppercase text-sm">Katalog Program 2026</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
               Kurikulum Berbasis Industri
             </p>
@@ -389,7 +389,7 @@ export default function Home() {
             <span className="font-bold text-white">AI & Tech Training Center</span>
             <span className="text-xs text-sky-400 font-semibold uppercase tracking-wider">Powered by PLAI BMD</span>
           </div>
-          <p className="text-slate-500 text-sm">© 2023 PLAI BMD. All rights reserved.</p>
+          <p className="text-slate-500 text-sm">© 2026 PLAI BMD. All rights reserved.</p>
         </div>
       </footer>
     </main>
