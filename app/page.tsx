@@ -1,33 +1,264 @@
 import Navbar from './components/Navbar';
 import Link from 'next/link';
+import { useState } from 'react';
 
-// 1. Fungsi Mengambil Data menggunakan REST API (Bukan GraphQL)
-async function getWordPressData() {
-  try {
-    // Mengambil data Posts dari REST API yang lolos Cloudflare
-    const res = await fetch('https://ait.plai.ac.id/wp-json/wp/v2/posts', {
-      // Cache data selama 60 detik agar tidak lambat
-      next: { revalidate: 60 },
-    });
+// --- DATA SILABUS (DIAMBIL DARI DOKUMEN WORD) ---
+const allCourses = [
+  // --- SAINS DATA TERAPAN ---
+  {
+    id: 'sd-1',
+    category: 'Sains Data Terapan',
+    title: 'Data Science with Python',
+    duration: '3 Hari (5 Jam perhari)',
+    instructor: 'Hidayah Nurul Hasanah Zen',
+    price: 'Rp 3.000.000,-/orang',
+    description: 'Fondasi programming Python untuk manipulasi data, visualisasi, dan machine learning dasar.'
+  },
+  {
+    id: 'sd-2',
+    category: 'Sains Data Terapan',
+    title: 'Data Analytic using Excel',
+    duration: '2 Hari (5 Jam perhari)',
+    instructor: 'Hidayah Nurul Hasanah Zen',
+    price: 'Rp 2.500.000,-/orang',
+    description: 'Kuasai analisis data bisnis menggunakan Excel untuk pengambilan keputusan yang akurat.'
+  },
+  {
+    id: 'sd-3',
+    category: 'Sains Data Terapan',
+    title: 'Computer Vision in Practice: Fake Image Detection from Scratch to Deployment',
+    duration: '2 Hari (5 Jam perhari)',
+    instructor: 'Syahmi Sajid',
+    price: 'Rp 1.500.000,-/orang',
+    description: 'Praktek mendeteksi gambar palsu (Deepfake) dari pengembangan model hingga deployment.'
+  },
 
-    if (!res.ok) {
-      throw new Error(`Gagal mengambil data: ${res.statusText}`);
-    }
+  // --- AI & ROBOTIK ---
+  {
+    id: 'ai-1',
+    category: 'AI & Robotik',
+    title: 'Business Process Modeling with BPMN using Bizagi',
+    duration: '2 Hari (5 Jam perhari)',
+    instructor: 'Yurio Windiatmoko',
+    price: 'Rp 3.000.000,-/orang',
+    description: 'Modeling proses bisnis menggunakan standar BPMN dengan alat bantu Bizagi.'
+  },
+  {
+    id: 'ai-2',
+    category: 'AI & Robotik',
+    title: 'Computer Vision untuk Quality Control & Monitoring Visual',
+    duration: '3 hari (5 jam perhari)',
+    instructor: 'Nurdana Ahmad Fadil',
+    price: 'Rp 3.000.000,-/orang',
+    description: 'Implementasi computer vision untuk kontrol kualitas otomatis dan monitoring visual pabrik.'
+  },
+  {
+    id: 'ai-3',
+    category: 'AI & Robotik',
+    title: 'AI untuk Otomasi Proses Bisnis & Analitik',
+    duration: '2 hari (5 jam perhari)',
+    instructor: 'Nurdana Ahmad Fadil',
+    price: 'Rp 2.000.000,-/orang',
+    description: 'Implementasi AI untuk efisiensi proses bisnis dan analitik data yang lebih cerdas.'
+  },
+  {
+    id: 'ai-4',
+    category: 'AI & Robotik',
+    title: 'AI untuk Pemasaran & Operasional UMKM',
+    duration: '2 hari (5 Jam perhari)',
+    instructor: 'Nurdana Ahmad Fadil',
+    price: 'Rp 1.500.000,-/orang',
+    description: 'Strategi pemasaran berbasis AI dan optimasi operasional untuk UMKM.'
+  },
+  {
+    id: 'ai-5',
+    category: 'AI & Robotik',
+    title: 'Pengembangan Aplikasi Mobile Berbasis AI untuk Bisnis & Layanan Publik',
+    duration: '3 hari (5 Jam perhari)',
+    instructor: 'Nurdana Ahmad Fadil',
+    price: 'Rp 3.000.000,-/orang',
+    description: 'Membangun aplikasi mobile cerdas berbasis AI untuk kebutuhan bisnis.'
+  },
+  {
+    id: 'ai-6',
+    category: 'AI & Robotik',
+    title: 'Prompt Engineering untuk Produktivitas Profesional & Edukasi',
+    duration: '2 hari (5 Jam perhari)',
+    instructor: 'Nurdana Ahmad Fadil',
+    price: 'Rp 1.000.000,-/orang',
+    description: 'Tingkatkan produktivitas profesional dan edukasi dengan teknik prompt yang efektif.'
+  },
+  {
+    id: 'ai-7',
+    category: 'AI & Robotik',
+    title: 'Vibe Coding untuk Pengembangan Aplikasi Profesional',
+    duration: '2 hari (5 Jam perhari)',
+    instructor: 'Nurdana Ahmad Fadil',
+    price: 'Rp 3.000.000,-/orang',
+    description: 'Teknik coding modern untuk pengembangan aplikasi yang cepat dan efisien.'
+  },
+  {
+    id: 'ai-8',
+    category: 'AI & Robotik',
+    title: 'AutoCad Basic',
+    duration: '2 hari (5 Jam perhari)',
+    instructor: 'Yulis Rijal Fauzan',
+    price: 'Rp 1.500.000,-/orang',
+    description: 'Desain teknis dasar untuk kebutuhan engineering dan manufaktur digital.'
+  },
+  {
+    id: 'ai-9',
+    category: 'AI & Robotik',
+    title: 'Electrical AutoCad',
+    duration: '2 hari (5 Jam perhari)',
+    instructor: 'Yulis Rijal Fauzan',
+    price: 'Rp 2.500.000,-/orang',
+    description: 'Desain teknik listrik dan elektronik menggunakan AutoCAD.'
+  },
+  {
+    id: 'ai-10',
+    category: 'AI & Robotik',
+    title: 'Programmable Logic Control (PLC)',
+    duration: '2 hari (5 Jam perhari)',
+    instructor: 'Yulis, Satria, Vian',
+    price: 'Rp 4.000.000,-/orang',
+    description: 'Logika kontrol otomatis untuk sistem industri, perhatikan: PLC belum tersedia.'
+  },
+  {
+    id: 'ai-11',
+    category: 'AI & Robotik',
+    title: 'Pelatihan Microsoft Office Specialist',
+    duration: '2 hari (5 Jam perhari)',
+    instructor: 'Satria',
+    price: 'Rp 1.500.000,-/orang',
+    description: 'Penguasaan paket Microsoft Office standar industri untuk produktivitas kantor.'
+  },
+  {
+    id: 'ai-12',
+    category: 'AI & Robotik',
+    title: 'Pelatihan Design, Deploy & Maintain IoT untuk Pabrik Lokal',
+    duration: '2 hari (5 Jam perhari)',
+    instructor: 'Kristiawan Devianto',
+    price: 'Rp 1.799.999,-/orang',
+    description: 'Perancangan, pemasangan, dan pemeliharaan sistem IoT untuk pabrik skala lokal.'
+  },
 
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching WordPress:", error);
-    return null;
+  // --- REKAYASA KEAMANAN SIBER ---
+  {
+    id: 'cs-1',
+    category: 'Rekayasa Keamanan Siber',
+    title: 'Cybersecurity Awareness & Basic Defense',
+    duration: '2 Hari (5 jam/hari)',
+    instructor: 'Aan Kurniawan',
+    price: 'Rp 1.500.000,-/orang',
+    description: 'Pelatihan dasar pertahanan siber untuk karyawan dan manajemen non-teknis.'
+  },
+  {
+    id: 'cs-2',
+    category: 'Rekayasa Keamanan Siber',
+    title: 'Object Oriented Programming with Java',
+    duration: '3 Hari (5 jam/hari)',
+    instructor: 'Fahmi Auliya Tsani',
+    price: 'Rp 1.000.000,-/orang',
+    description: 'Pemrograman berorientasi objek fundamental menggunakan bahasa Java.'
+  },
+  {
+    id: 'cs-3',
+    category: 'Rekayasa Keamanan Siber',
+    title: 'RESTful API with Java Spring Boot',
+    duration: '4 hari (8 jam/hari)',
+    instructor: 'Fahmi Auliya Tsani',
+    price: 'Rp 1.500.000,-/orang',
+    description: 'Membangun API yang kuat dan aman menggunakan Spring Boot.'
+  },
+  {
+    id: 'cs-4',
+    category: 'Rekayasa Keamanan Siber',
+    title: 'Secure Coding with Java (OWASP Top 10)',
+    duration: '3 Hari (5 jam/hari)',
+    instructor: 'Fahmi Auliya Tsani',
+    price: 'Rp 3.000.000,-/orang',
+    description: 'Secure coding standar industri untuk mencegah vulnerabilitas OWASP Top 10.'
+  },
+  {
+    id: 'cs-5',
+    category: 'Rekayasa Keamanan Siber',
+    title: 'Incident Handler',
+    duration: '3 Hari (5 jam/hari)',
+    instructor: 'Aan Kurniawan',
+    price: 'Rp 7.500.000,-/orang',
+    description: 'Penanganan insiden keamanan siber dan prosedur respon insiden.'
   }
+];
+
+// --- KOMPONEN CARD COURSE (Reusable) ---
+function CourseCard({ course }: { course: any }) {
+  return (
+    <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-sky-500/30 transition-all hover:-translate-y-1">
+      <div className="flex justify-between items-start mb-4">
+        {/* Icon berdasarkan kategori (Visual sederhana) */}
+        <div className={`p-3 rounded-lg ${
+          course.category === 'Sains Data Terapan' ? 'bg-blue-500/10 text-blue-400' :
+          course.category === 'AI & Robotik' ? 'bg-indigo-500/10 text-indigo-400' :
+          'bg-red-500/10 text-red-400'
+        }`}>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5c-1.746 0-3.332.477-4.475 1.253v13C4.168 19.003 6.466 21.5 7.5 21.5c1.746 0 3.332-.477 4.475-1.253V11.757c0-1.253-.729-2.475-1.475-4.475V5.253z" /></svg>
+        </div>
+        <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">
+          {course.duration.split(' ')[0]} {/* Ambil "2 Hari" dari string */}
+        </span>
+      </div>
+      <h4 className="text-lg font-bold text-white mb-2 line-clamp-1">{course.title}</h4>
+      <p className="text-slate-400 text-sm mb-4 line-clamp-2">{course.description}</p>
+      <div className="text-sky-400 font-bold text-sm">
+        {course.price} <span className="text-slate-500 font-normal">/orang</span>
+      </div>
+    </div>
+  );
 }
 
-export default async function Home() {
-  // 2. Panggil data
-  const wpData = await getWordPressData();
-  
-  // Ambil posts aman, kalau error ambil array kosong
-  const posts = wpData || [];
+// --- COMPONENT LIST KATEGORI (Dengan Logic Load More) ---
+function CategorySection({ title, initialLimit, categoryData, colorBar, colorBorder }: any) {
+  const [visibleCount, setVisibleCount] = useState(initialLimit);
+  const items = categoryData;
+
+  const handleShowMore = () => {
+    setVisibleCount(items.length); // Tampilkan semua item
+  };
+
+  return (
+    <div className="mb-16">
+      <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+        <span className={`w-1 h-6 rounded-full ${colorBar}`}></span>
+        {title}
+      </h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {items.slice(0, visibleCount).map((course: any) => (
+          <CourseCard key={course.id} course={course} />
+        ))}
+      </div>
+
+      {/* Tombol More: Hanya muncul jika total item lebih dari limit awal */}
+      {visibleCount < items.length && (
+        <div className="mt-8 text-center">
+          <button 
+            onClick={handleShowMore}
+            className="px-6 py-2 rounded-full border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 hover:bg-slate-800 transition-all text-sm font-semibold"
+          >
+            Tampilkan Lebih Banyak ({items.length - initialLimit} Lagi)
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Home() {
+  // Pisahkan data berdasarkan kategori
+  const dataSainsData = allCourses.filter(c => c.category === 'Sains Data Terapan');
+  const dataAiRobotik = allCourses.filter(c => c.category === 'AI & Robotik');
+  const dataCyber = allCourses.filter(c => c.category === 'Rekayasa Keamanan Siber');
 
   return (
     <main className="min-h-screen bg-[#0f172a] text-slate-300 font-sans selection:bg-sky-500 selection:text-white">
@@ -39,7 +270,7 @@ export default async function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-sky-500/10 rounded-full blur-[120px] -z-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-900/30 border border-sky-500/30 text-sky-300 text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-900/30 border border-sky-500/30 text-sky-300 text-sm font-medium mb-8 animate-fade-in-up">
             <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
             Official Training Partner PLAI BMD
           </div>
@@ -60,50 +291,39 @@ export default async function Home() {
               Lihat Program
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
             </Link>
-            <Link href="#bridge" className="px-8 py-4 rounded-lg bg-white/5 hover:bg-white/10 text-white font-medium text-lg border border-white/10 transition-all backdrop-blur-sm">
+            <Link href="#contact" className="px-8 py-4 rounded-lg bg-white/5 hover:bg-white/10 text-white font-medium text-lg border border-white/10 transition-all backdrop-blur-sm">
               Konsultasi Gratis
             </Link>
           </div>
         </div>
       </section>
 
-      {/* --- SECTION INTEGRASI DATA (TES KONEKSI) --- */}
-      <section className="py-16 bg-slate-950 border-y border-white/5">
-        <div className="max-w-7xl mx-auto px-4">
-          <h3 className="text-center text-sky-400 text-sm font-bold uppercase tracking-widest mb-6">
-            Integrasi REST API (Live Data)
-          </h3>
-          
-          {posts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {posts.map((post: any) => (
-                <div key={post.id} className="bg-slate-900 p-6 rounded-xl border border-slate-700 hover:border-sky-500/50 transition-all">
-                  <div className="text-xs text-slate-500 mb-2">ID: {post.id}</div>
-                  <h4 className="text-lg font-bold text-white mb-2" dangerouslySetInnerHTML={{ __html: post.title.rendered }}></h4>
-                  <div 
-                    className="text-slate-400 text-sm line-clamp-3" 
-                    dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }} 
-                  />
-                  <div className="mt-4 flex justify-between items-center">
-                    <span className="text-xs text-sky-400 font-semibold">
-                      {new Date(post.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </span>
-                    <a href={post.link} target="_blank" className="text-xs text-white bg-slate-700 px-3 py-1 rounded hover:bg-slate-600 transition">
-                      Baca di WP
-                    </a>
-                  </div>
-                </div>
-              ))}
+      {/* --- THE BRIDGE --- */}
+      <section id="bridge" className="py-20 bg-slate-800 border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-12 text-center">
+            <div className="relative">
+              <div className="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6 border border-sky-500/30 text-sky-400 font-bold text-xl relative z-10">1</div>
+              <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gradient-to-r from-sky-500/50 to-transparent -z-0"></div>
+              <h3 className="text-xl font-bold text-white mb-3">Digital Literacy</h3>
+              <p className="text-slate-400 text-sm">Penguasaan tools dasar: Microsoft Office Specialist, AutoCAD, dan Analitik Excel.</p>
             </div>
-          ) : (
-            <div className="text-center text-slate-500">
-              Belum ada data post yang bisa diambil, atau koneksi terputus.
+            <div className="relative">
+              <div className="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6 border border-indigo-500/30 text-indigo-400 font-bold text-xl relative z-10">2</div>
+              <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gradient-to-r from-indigo-500/50 to-transparent -z-0"></div>
+              <h3 className="text-xl font-bold text-white mb-3">Data & Automation</h3>
+              <p className="text-slate-400 text-sm">Tingkatkan kapabilitas dengan Python, IoT, dan Otomasi Proses Bisnis (BPA).</p>
             </div>
-          )}
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-sky-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-xl shadow-lg shadow-sky-500/25">3</div>
+              <h3 className="text-xl font-bold text-white mb-3">Advanced AI</h3>
+              <p className="text-slate-400 text-sm">Implementasi tingkat lanjut: Computer Vision, Prompt Engineering, dan Secure Coding.</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* --- PROGRAMS SECTION (DATA STATIS) --- */}
+      {/* --- PROGRAMS SECTION --- */}
       <section id="programs" className="py-24 bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -114,141 +334,30 @@ export default async function Home() {
             <p className="mt-4 text-slate-400">Disusun oleh para praktisi PLAI BMD untuk menjawab tantangan masa depan.</p>
           </div>
 
-          {/* Kategori 1 */}
-          <div className="mb-16">
-            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <span className="w-1 h-6 bg-sky-500 rounded-full"></span>
-              Sains Data & Analitik
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-sky-500/30 transition-all hover:-translate-y-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-blue-500/10 rounded-lg text-blue-400">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                  </div>
-                  <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">2 Hari</span>
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">Data Analytic using Excel</h4>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">Kuasai analisis data bisnis menggunakan Excel untuk pengambilan keputusan yang akurat.</p>
-                <div className="text-sky-400 font-bold text-sm">Rp 2.500.000 <span className="text-slate-500 font-normal">/orang</span></div>
-              </div>
+          {/* Render Kategori dengan fungsi Load More */}
+          <CategorySection 
+            title="Sains Data & Analitik"
+            initialLimit={3}
+            categoryData={dataSainsData}
+            colorBar="bg-sky-500"
+            colorBorder="hover:border-sky-500/30"
+          />
 
-              <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-sky-500/30 transition-all hover:-translate-y-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-yellow-500/10 rounded-lg text-yellow-400">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                  </div>
-                  <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">3 Hari</span>
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">Data Science with Python</h4>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">Fondasi programming Python untuk manipulasi data, visualisasi, dan machine learning dasar.</p>
-                <div className="text-sky-400 font-bold text-sm">Rp 3.000.000 <span className="text-slate-500 font-normal">/orang</span></div>
-              </div>
+          <CategorySection 
+            title="AI & Robotik untuk Industri"
+            initialLimit={3}
+            categoryData={dataAiRobotik}
+            colorBar="bg-indigo-500"
+            colorBorder="hover:border-indigo-500/30"
+          />
 
-              <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-sky-500/30 transition-all hover:-translate-y-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-purple-500/10 rounded-lg text-purple-400">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                  </div>
-                  <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">2 Hari</span>
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">Computer Vision: Fake Image</h4>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">Praktek mendeteksi gambar palsu (Deepfake) dari pengembangan model hingga deployment.</p>
-                <div className="text-sky-400 font-bold text-sm">Rp 1.500.000 <span className="text-slate-500 font-normal">/orang</span></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Kategori 2 */}
-          <div className="mb-16">
-            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <span className="w-1 h-6 bg-indigo-500 rounded-full"></span>
-              AI & Robotik untuk Industri
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-indigo-500/30 transition-all hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg">BEST SELLER</div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-indigo-500/10 rounded-lg text-indigo-400">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  </div>
-                  <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">2 Hari</span>
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">Prompt Engineering</h4>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">Tingkatkan produktivitas profesional dan edukasi dengan teknik prompt yang efektif.</p>
-                <div className="text-sky-400 font-bold text-sm">Rp 1.000.000 <span className="text-slate-500 font-normal">/orang</span></div>
-              </div>
-
-              <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-indigo-500/30 transition-all hover:-translate-y-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-green-500/10 rounded-lg text-green-400">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                  </div>
-                  <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">2 Hari</span>
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">AI untuk Otomasi Bisnis</h4>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">Implementasi AI untuk efisiensi proses bisnis dan analitik data yang lebih cerdas.</p>
-                <div className="text-sky-400 font-bold text-sm">Rp 2.000.000 <span className="text-slate-500 font-normal">/orang</span></div>
-              </div>
-
-              <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-indigo-500/30 transition-all hover:-translate-y-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-orange-500/10 rounded-lg text-orange-400">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
-                  </div>
-                  <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">2 Hari</span>
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">AutoCad Basic</h4>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">Desain teknis dasar untuk kebutuhan engineering dan manufaktur digital.</p>
-                <div className="text-sky-400 font-bold text-sm">Rp 1.500.000 <span className="text-slate-500 font-normal">/orang</span></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Kategori 3 */}
-          <div>
-            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <span className="w-1 h-6 bg-red-500 rounded-full"></span>
-              Rekayasa Keamanan Siber
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-red-500/30 transition-all hover:-translate-y-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-red-500/10 rounded-lg text-red-400">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                  </div>
-                  <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">2 Hari</span>
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">Cybersecurity Awareness</h4>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">Pelatihan dasar pertahanan siber untuk karyawan dan manajemen non-teknis.</p>
-                <div className="text-sky-400 font-bold text-sm">Rp 1.500.000 <span className="text-slate-500 font-normal">/orang</span></div>
-              </div>
-
-              <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-red-500/30 transition-all hover:-translate-y-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-blue-500/10 rounded-lg text-blue-400">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                  </div>
-                  <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">3 Hari</span>
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">OOP with Java</h4>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">Pemrograman berorientasi objek fundamental menggunakan bahasa Java.</p>
-                <div className="text-sky-400 font-bold text-sm">Rp 1.000.000 <span className="text-slate-500 font-normal">/orang</span></div>
-              </div>
-
-              <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-red-500/30 transition-all hover:-translate-y-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-pink-500/10 rounded-lg text-pink-400">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5.5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                  </div>
-                  <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">4 Hari</span>
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">RESTful API with Java</h4>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">Membangun API yang kuat dan aman menggunakan Spring Boot.</p>
-                <div className="text-sky-400 font-bold text-sm">Rp 1.500.000 <span className="text-slate-500 font-normal">/orang</span></div>
-              </div>
-            </div>
-          </div>
+          <CategorySection 
+            title="Rekayasa Keamanan Siber"
+            initialLimit={3}
+            categoryData={dataCyber}
+            colorBar="bg-red-500"
+            colorBorder="hover:border-red-500/30"
+          />
         </div>
       </section>
 
