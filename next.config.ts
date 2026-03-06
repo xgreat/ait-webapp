@@ -22,11 +22,12 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.vercel.app *.vercel.com cdn.vercel.com",
-              "style-src 'self' 'unsafe-inline' fonts.googleapis.com",
-              "font-src 'self' fonts.gstatic.com",
-              "img-src 'self' data: https: *.vercel.app *.wp.com",
+              "default-src 'self' https://ait.plai.ac.id",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.vercel.app *.vercel.com cdn.vercel.com https://ait.plai.ac.id",
+              "style-src 'self' 'unsafe-inline' fonts.googleapis.com https://ait.plai.ac.id *.wp.com",
+              "font-src 'self' fonts.gstatic.com https://ait.plai.ac.id",
+              "img-src 'self' data: https: *.vercel.app *.wp.com https://ait.plai.ac.id",
+              "media-src 'self' https://ait.plai.ac.id *.wp.com",
               "connect-src 'self' *.vercel.app *.wp.com https://ait.plai.ac.id",
               "frame-src 'none'",
               "object-src 'none'",

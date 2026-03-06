@@ -1,0 +1,63 @@
+🚀 QUICK ACTION - Langkah yang HARUS dikerjakan untuk fix SVG issue
+
+===============================================================================
+⚠️ LANGKAH KRUSIAL - COPY & PASTE KE WORDPRESS functions.php
+===============================================================================
+
+File: wp-content/themes/twentytwentyfive/functions.php
+
+COPY KOD INI DAN PASTE DI AKHIR FILE (SEBELUM CLOSING PHP TAG ?>):
+
+───────────────────────────────────────────────────────────────────────────
+
+// DISABLE THEME CSS - NEXT.JS INTEGRATION
+function ait_disable_theme_styles() {
+    wp_dequeue_style( 'twentytwentyfive-style' );
+    wp_dequeue_style( 'global-styles' );
+    wp_dequeue_style( 'wp-block-library' );
+    wp_dequeue_style( 'wp-block-library-theme' );
+}
+add_action( 'wp_enqueue_scripts', 'ait_disable_theme_styles', 11 );
+
+function ait_minimal_css_reset() {
+    if ( is_admin() ) return;
+    $css = "html, body { margin: 0 !important; padding: 0 !important; background: transparent !important; } svg { max-width: 100% !important; height: auto !important; } body > main { all: initial !important; }";
+    wp_add_inline_style( 'wp-block-library', $css );
+}
+add_action( 'wp_enqueue_scripts', 'ait_minimal_css_reset', 999 );
+
+function ait_hide_admin_bar() {
+    remove_action( 'wp_footer', 'wp_admin_bar_render' );
+}
+add_action( 'wp_head', 'ait_hide_admin_bar' );
+
+───────────────────────────────────────────────────────────────────────────
+
+✅ SUDAH DIKERJAKAN:
+  [✓] CSP Headers updated di next.config.ts
+  [✓] Domain ait.plai.ac.id added ke CSP
+  [✓] Build tested dan SUCCESS
+
+⏳ YANG PERLU DIKERJAKAN OLEH USER:
+  [ ] Add code di atas ke WordPress functions.php
+  [ ] Save functions.php
+  [ ] Clear WordPress cache
+  [ ] Test di browser (F12 untuk check console errors)
+
+📊 EXPECTED RESULT:
+  - SVG tidak dominan lagi
+  - Dark theme dengan styling normal
+  - Hero section, programs, contact visible
+  - No CSS warnings di console
+
+📞 JIKA MASIH ERROR:
+  - Check WORDPRESS_SVG_FIX_GUIDE.md untuk debugging steps
+  - Check browser console (F12) untuk CSP/CORS errors
+  - Check Network tab untuk CSS loading status
+
+✅ BUILD STATUS: SUCCESS
+   npm run build ✓
+   CSP Headers ✓
+   Next.js Frontend ✓
+   
+READY to test dengan WordPress! 🎉
