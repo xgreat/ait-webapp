@@ -33,16 +33,13 @@ const nextConfig: NextConfig = {
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
-              "frame-ancestors 'none'",
+              "frame-ancestors https://ait.plai.ac.id",
               "upgrade-insecure-requests"
             ].join('; ')
           },
 
           // A05:2021-Security Misconfiguration - Security Headers
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY'
-          },
+          // Note: X-Frame-Options removed as CSP frame-ancestors handles iframe control
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff'
@@ -110,6 +107,7 @@ const nextConfig: NextConfig = {
 
   // Image optimization with security
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
