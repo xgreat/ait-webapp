@@ -80,6 +80,11 @@ export const metadata: Metadata = {
     google: "your-google-site-verification-code",
     yandex: "your-yandex-verification-code",
   },
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export const viewport: Viewport = {
@@ -100,6 +105,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Minimal WordPress cleanup - only remove admin bar
+              document.addEventListener('DOMContentLoaded', function() {
+                const wpAdminBar = document.getElementById('wpadminbar');
+                if (wpAdminBar) wpAdminBar.remove();
+              });
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
