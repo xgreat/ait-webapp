@@ -1,268 +1,10 @@
 import Navbar from './components/Navbar';
 import Link from 'next/link';
-import { useState } from 'react';
-
-// --- DATA SILABUS (DIAMBIL DARI DOKUMEN WORD) ---
-const allCourses = [
-  // --- SAINS DATA TERAPAN ---
-  {
-    id: 'sd-1',
-    category: 'Sains Data Terapan',
-    title: 'Data Science with Python',
-    duration: '3 Hari (5 Jam perhari)',
-    instructor: 'Hidayah Nurul Hasanah Zen',
-    price: 'Rp 3.000.000,-/orang',
-    description: 'Fondasi programming Python untuk manipulasi data, visualisasi, dan machine learning dasar.'
-  },
-  {
-    id: 'sd-2',
-    category: 'Sains Data Terapan',
-    title: 'Data Analytic using Excel',
-    duration: '2 Hari (5 Jam perhari)',
-    instructor: 'Hidayah Nurul Hasanah Zen',
-    price: 'Rp 2.500.000,-/orang',
-    description: 'Kuasai analisis data bisnis menggunakan Excel untuk pengambilan keputusan yang akurat.'
-  },
-  {
-    id: 'sd-3',
-    category: 'Sains Data Terapan',
-    title: 'Computer Vision in Practice: Fake Image Detection from Scratch to Deployment',
-    duration: '2 Hari (5 Jam perhari)',
-    instructor: 'Syahmi Sajid',
-    price: 'Rp 1.500.000,-/orang',
-    description: 'Praktek mendeteksi gambar palsu (Deepfake) dari pengembangan model hingga deployment.'
-  },
-
-  // --- AI & ROBOTIK ---
-  {
-    id: 'ai-1',
-    category: 'AI & Robotik',
-    title: 'Business Process Modeling with BPMN using Bizagi',
-    duration: '2 Hari (5 Jam perhari)',
-    instructor: 'Yurio Windiatmoko',
-    price: 'Rp 3.000.000,-/orang',
-    description: 'Modeling proses bisnis menggunakan standar BPMN dengan alat bantu Bizagi.'
-  },
-  {
-    id: 'ai-2',
-    category: 'AI & Robotik',
-    title: 'Computer Vision untuk Quality Control & Monitoring Visual',
-    duration: '3 hari (5 jam perhari)',
-    instructor: 'Nurdana Ahmad Fadil',
-    price: 'Rp 3.000.000,-/orang',
-    description: 'Implementasi computer vision untuk kontrol kualitas otomatis dan monitoring visual pabrik.'
-  },
-  {
-    id: 'ai-3',
-    category: 'AI & Robotik',
-    title: 'AI untuk Otomasi Proses Bisnis & Analitik',
-    duration: '2 hari (5 jam perhari)',
-    instructor: 'Nurdana Ahmad Fadil',
-    price: 'Rp 2.000.000,-/orang',
-    description: 'Implementasi AI untuk efisiensi proses bisnis dan analitik data yang lebih cerdas.'
-  },
-  {
-    id: 'ai-4',
-    category: 'AI & Robotik',
-    title: 'AI untuk Pemasaran & Operasional UMKM',
-    duration: '2 hari (5 Jam perhari)',
-    instructor: 'Nurdana Ahmad Fadil',
-    price: 'Rp 1.500.000,-/orang',
-    description: 'Strategi pemasaran berbasis AI dan optimasi operasional untuk UMKM.'
-  },
-  {
-    id: 'ai-5',
-    category: 'AI & Robotik',
-    title: 'Pengembangan Aplikasi Mobile Berbasis AI untuk Bisnis & Layanan Publik',
-    duration: '3 hari (5 Jam perhari)',
-    instructor: 'Nurdana Ahmad Fadil',
-    price: 'Rp 3.000.000,-/orang',
-    description: 'Membangun aplikasi mobile cerdas berbasis AI untuk kebutuhan bisnis.'
-  },
-  {
-    id: 'ai-6',
-    category: 'AI & Robotik',
-    title: 'Prompt Engineering untuk Produktivitas Profesional & Edukasi',
-    duration: '2 hari (5 Jam perhari)',
-    instructor: 'Nurdana Ahmad Fadil',
-    price: 'Rp 1.000.000,-/orang',
-    description: 'Tingkatkan produktivitas profesional dan edukasi dengan teknik prompt yang efektif.'
-  },
-  {
-    id: 'ai-7',
-    category: 'AI & Robotik',
-    title: 'Vibe Coding untuk Pengembangan Aplikasi Profesional',
-    duration: '2 hari (5 Jam perhari)',
-    instructor: 'Nurdana Ahmad Fadil',
-    price: 'Rp 3.000.000,-/orang',
-    description: 'Teknik coding modern untuk pengembangan aplikasi yang cepat dan efisien.'
-  },
-  {
-    id: 'ai-8',
-    category: 'AI & Robotik',
-    title: 'AutoCad Basic',
-    duration: '2 hari (5 Jam perhari)',
-    instructor: 'Yulis Rijal Fauzan',
-    price: 'Rp 1.500.000,-/orang',
-    description: 'Desain teknis dasar untuk kebutuhan engineering dan manufaktur digital.'
-  },
-  {
-    id: 'ai-9',
-    category: 'AI & Robotik',
-    title: 'Electrical AutoCad',
-    duration: '2 hari (5 Jam perhari)',
-    instructor: 'Yulis Rijal Fauzan',
-    price: 'Rp 2.500.000,-/orang',
-    description: 'Desain teknik listrik dan elektronik menggunakan AutoCAD.'
-  },
-  {
-    id: 'ai-10',
-    category: 'AI & Robotik',
-    title: 'Programmable Logic Control (PLC)',
-    duration: '2 hari (5 Jam perhari)',
-    instructor: 'Yulis, Satria, Vian',
-    price: 'Rp 4.000.000,-/orang',
-    description: 'Logika kontrol otomatis untuk sistem industri, perhatikan: PLC belum tersedia.'
-  },
-  {
-    id: 'ai-11',
-    category: 'AI & Robotik',
-    title: 'Pelatihan Microsoft Office Specialist',
-    duration: '2 hari (5 Jam perhari)',
-    instructor: 'Satria',
-    price: 'Rp 1.500.000,-/orang',
-    description: 'Penguasaan paket Microsoft Office standar industri untuk produktivitas kantor.'
-  },
-  {
-    id: 'ai-12',
-    category: 'AI & Robotik',
-    title: 'Pelatihan Design, Deploy & Maintain IoT untuk Pabrik Lokal',
-    duration: '2 hari (5 Jam perhari)',
-    instructor: 'Kristiawan Devianto',
-    price: 'Rp 1.799.999,-/orang',
-    description: 'Perancangan, pemasangan, dan pemeliharaan sistem IoT untuk pabrik skala lokal.'
-  },
-
-  // --- REKAYASA KEAMANAN SIBER ---
-  {
-    id: 'cs-1',
-    category: 'Rekayasa Keamanan Siber',
-    title: 'Cybersecurity Awareness & Basic Defense',
-    duration: '2 Hari (5 jam/hari)',
-    instructor: 'Aan Kurniawan',
-    price: 'Rp 1.500.000,-/orang',
-    description: 'Pelatihan dasar pertahanan siber untuk karyawan dan manajemen non-teknis.'
-  },
-  {
-    id: 'cs-2',
-    category: 'Rekayasa Keamanan Siber',
-    title: 'Object Oriented Programming with Java',
-    duration: '3 Hari (5 jam/hari)',
-    instructor: 'Fahmi Auliya Tsani',
-    price: 'Rp 1.000.000,-/orang',
-    description: 'Pemrograman berorientasi objek fundamental menggunakan bahasa Java.'
-  },
-  {
-    id: 'cs-3',
-    category: 'Rekayasa Keamanan Siber',
-    title: 'RESTful API with Java Spring Boot',
-    duration: '4 hari (8 jam/hari)',
-    instructor: 'Fahmi Auliya Tsani',
-    price: 'Rp 1.500.000,-/orang',
-    description: 'Membangun API yang kuat dan aman menggunakan Spring Boot.'
-  },
-  {
-    id: 'cs-4',
-    category: 'Rekayasa Keamanan Siber',
-    title: 'Secure Coding with Java (OWASP Top 10)',
-    duration: '3 Hari (5 jam/hari)',
-    instructor: 'Fahmi Auliya Tsani',
-    price: 'Rp 3.000.000,-/orang',
-    description: 'Secure coding standar industri untuk mencegah vulnerabilitas OWASP Top 10.'
-  },
-  {
-    id: 'cs-5',
-    category: 'Rekayasa Keamanan Siber',
-    title: 'Incident Handler',
-    duration: '3 Hari (5 jam/hari)',
-    instructor: 'Aan Kurniawan',
-    price: 'Rp 7.500.000,-/orang',
-    description: 'Penanganan insiden keamanan siber dan prosedur respon insiden.'
-  }
-];
-
-// --- KOMPONEN CARD COURSE (Reusable) ---
-function CourseCard({ course }: { course: any }) {
-  return (
-    <div className="group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-sky-500/30 transition-all hover:-translate-y-1">
-      <div className="flex justify-between items-start mb-4">
-        {/* Icon berdasarkan kategori (Visual sederhana) */}
-        <div className={`p-3 rounded-lg ${
-          course.category === 'Sains Data Terapan' ? 'bg-blue-500/10 text-blue-400' :
-          course.category === 'AI & Robotik' ? 'bg-indigo-500/10 text-indigo-400' :
-          'bg-red-500/10 text-red-400'
-        }`}>
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5c-1.746 0-3.332.477-4.475 1.253v13C4.168 19.003 6.466 21.5 7.5 21.5c1.746 0 3.332-.477 4.475-1.253V11.757c0-1.253-.729-2.475-1.475-4.475V5.253z" /></svg>
-        </div>
-        <span className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">
-          {course.duration.split(' ')[0]} {/* Ambil "2 Hari" dari string */}
-        </span>
-      </div>
-      <h4 className="text-lg font-bold text-white mb-2 line-clamp-1">{course.title}</h4>
-      <p className="text-slate-400 text-sm mb-4 line-clamp-2">{course.description}</p>
-      <div className="text-sky-400 font-bold text-sm">
-        {course.price} <span className="text-slate-500 font-normal">/orang</span>
-      </div>
-    </div>
-  );
-}
-
-// --- COMPONENT LIST KATEGORI (Dengan Logic Load More) ---
-function CategorySection({ title, initialLimit, categoryData, colorBar, colorBorder }: any) {
-  const [visibleCount, setVisibleCount] = useState(initialLimit);
-  const items = categoryData;
-
-  const handleShowMore = () => {
-    setVisibleCount(items.length); // Tampilkan semua item
-  };
-
-  return (
-    <div className="mb-16">
-      <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-        <span className={`w-1 h-6 rounded-full ${colorBar}`}></span>
-        {title}
-      </h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {items.slice(0, visibleCount).map((course: any) => (
-          <CourseCard key={course.id} course={course} />
-        ))}
-      </div>
-
-      {/* Tombol More: Hanya muncul jika total item lebih dari limit awal */}
-      {visibleCount < items.length && (
-        <div className="mt-8 text-center">
-          <button 
-            onClick={handleShowMore}
-            className="px-6 py-2 rounded-full border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 hover:bg-slate-800 transition-all text-sm font-semibold"
-          >
-            Tampilkan Lebih Banyak ({items.length - initialLimit} Lagi)
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
+import CourseList from './components/CourseList'; // Kita akan buat komponen ini nanti
 
 export default function Home() {
-  // Pisahkan data berdasarkan kategori
-  const dataSainsData = allCourses.filter(c => c.category === 'Sains Data Terapan');
-  const dataAiRobotik = allCourses.filter(c => c.category === 'AI & Robotik');
-  const dataCyber = allCourses.filter(c => c.category === 'Rekayasa Keamanan Siber');
-
   return (
     <main className="min-h-screen bg-[#0f172a] text-slate-300 font-sans selection:bg-sky-500 selection:text-white">
-      
       <Navbar />
 
       {/* --- HERO SECTION --- */}
@@ -270,7 +12,7 @@ export default function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-sky-500/10 rounded-full blur-[120px] -z-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-900/30 border border-sky-500/30 text-sky-300 text-sm font-medium mb-8 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-900/30 border border-sky-500/30 text-sky-300 text-sm font-medium mb-8">
             <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
             Official Training Partner PLAI BMD
           </div>
@@ -323,7 +65,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- PROGRAMS SECTION --- */}
+      {/* --- PROGRAMS SECTION (Call Component Khusus) --- */}
       <section id="programs" className="py-24 bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -334,30 +76,8 @@ export default function Home() {
             <p className="mt-4 text-slate-400">Disusun oleh para praktisi PLAI BMD untuk menjawab tantangan masa depan.</p>
           </div>
 
-          {/* Render Kategori dengan fungsi Load More */}
-          <CategorySection 
-            title="Sains Data & Analitik"
-            initialLimit={3}
-            categoryData={dataSainsData}
-            colorBar="bg-sky-500"
-            colorBorder="hover:border-sky-500/30"
-          />
-
-          <CategorySection 
-            title="AI & Robotik untuk Industri"
-            initialLimit={3}
-            categoryData={dataAiRobotik}
-            colorBar="bg-indigo-500"
-            colorBorder="hover:border-indigo-500/30"
-          />
-
-          <CategorySection 
-            title="Rekayasa Keamanan Siber"
-            initialLimit={3}
-            categoryData={dataCyber}
-            colorBar="bg-red-500"
-            colorBorder="hover:border-red-500/30"
-          />
+          {/* Memanggil komponen CourseList yang berisi logika interaktif */}
+          <CourseList />
         </div>
       </section>
 
