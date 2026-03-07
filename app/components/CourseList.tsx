@@ -12,7 +12,8 @@ const allCourses = [
     duration: '3 Hari (5 Jam perhari)',
     instructor: 'Hidayah Nurul Hasanah Zen',
     price: 'Rp 3.000.000,-/orang',
-    description: 'Fondasi programming Python untuk manipulasi data, visualisasi, dan machine learning dasar.'
+    description: 'Fondasi programming Python untuk manipulasi data, visualisasi, dan machine learning dasar.',
+    label: 'Best Seller'
   },
   {
     id: 'sd-2',
@@ -86,7 +87,8 @@ const allCourses = [
     duration: '2 hari (5 Jam perhari)',
     instructor: 'Nurdana Ahmad Fadil',
     price: 'Rp 1.000.000,-/orang',
-    description: 'Tingkatkan produktivitas profesional dan edukasi dengan teknik prompt yang efektif.'
+    description: 'Tingkatkan produktivitas profesional dan edukasi dengan teknik prompt yang efektif.',
+    label: 'Best Seller'
   },
   {
     id: 'ai-7',
@@ -178,7 +180,8 @@ const allCourses = [
     duration: '3 Hari (5 jam/hari)',
     instructor: 'Fahmi Auliya Tsani',
     price: 'Rp 3.000.000,-/orang',
-    description: 'Secure coding standar industri untuk mencegah vulnerabilitas OWASP Top 10.'
+    description: 'Secure coding standar industri untuk mencegah vulnerabilitas OWASP Top 10.',
+    label: 'Hot Item'
   },
   {
     id: 'cs-5',
@@ -366,9 +369,15 @@ function CourseCard({ course }: { course: any }) {
   };
 
   return (
-    <div className={`group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-sky-500/30 transition-all hover:-translate-y-1 relative overflow-hidden ${course.id === 'ai-6' ? 'relative overflow-hidden' : ''}`}>
-      {course.id === 'ai-6' && (
-        <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg">BEST SELLER</div>
+    <div className={`group bg-slate-800 rounded-xl p-6 border border-white/5 hover:border-sky-500/30 transition-all hover:-translate-y-1 relative overflow-hidden ${course.label ? 'ring-2 ring-yellow-500/20' : ''}`}>
+      {course.label && (
+        <div className={`absolute top-0 right-0 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg ${
+          course.label === 'Best Seller' ? 'bg-indigo-600' :
+          course.label === 'Hot Item' ? 'bg-red-600' :
+          'bg-gray-600'
+        }`}>
+          {course.label.toUpperCase()}
+        </div>
       )}
       <div className="flex justify-between items-start mb-4">
         {getIcon(course)}
@@ -389,7 +398,12 @@ function CourseCard({ course }: { course: any }) {
 function CategorySection({ title, initialLimit, categoryData, colorBar, colorBorder }: any) {
   // State untuk mengontrol berapa kartu yang ditampilkan (Default: 3)
   const [visibleCount, setVisibleCount] = useState(initialLimit);
-  const items = categoryData;
+  // Sort items: kursus dengan label terlebih dahulu
+  const items = [...categoryData].sort((a, b) => {
+    if (a.label && !b.label) return -1;
+    if (!a.label && b.label) return 1;
+    return 0;
+  });
 
   const handleShowMore = () => {
     setVisibleCount(items.length); // Tampilkan semua item

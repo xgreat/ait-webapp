@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "https://ait.plai.ac.id/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "AIT Training Platform - PLAI BMD",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AIT Training Platform - Transformasi Digital Bersama Ahlinya",
     description: "Solusi pelatihan teknologi komprehensif dari PLAI BMD.",
-    images: ["/og-image.jpg"],
+    images: ["https://ait.plai.ac.id/og-image.jpg"],
     creator: "@ait_training",
   },
   robots: {
@@ -106,6 +106,22 @@ export default function RootLayout({
   return (
     <html lang="id">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "AIT Training Platform",
+              "url": "https://ait.plai.ac.id",
+              "logo": "https://ait.plai.ac.id/favicon.svg",
+              "description": "Solusi pelatihan teknologi komprehensif dari PLAI BMD. Fondasi data, keamanan siber, AI strategis untuk bisnis modern.",
+              "sameAs": [
+                "https://twitter.com/ait_training"
+              ]
+            })
+          }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `

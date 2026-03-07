@@ -108,7 +108,7 @@ export default function Home() {
                 <h3 className="text-xl font-semibold text-white mb-6">Kontak Langsung</h3>
                 <div className="space-y-4">
                   <a
-                    href="https://wa.me/6282137925412"
+                    href="https://wa.me/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-4 p-4 bg-green-900/20 border border-green-500/30 rounded-lg hover:bg-green-900/30 transition-colors group"
